@@ -1,6 +1,6 @@
 var app = require('express')();
 
-var peliasConfig = require( 'pelias-config' ).generate(require('./schema'));
+var peliasConfig = require( './config' ).generate(require('./schema'));
 
 if( peliasConfig.api.accessLog ){
   app.use( require( './middleware/access_log' ).createAccessLogger( peliasConfig.api.accessLog ) );
