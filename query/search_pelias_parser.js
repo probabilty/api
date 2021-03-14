@@ -2,7 +2,7 @@ const _ = require('lodash');
 const peliasQuery = require('pelias-query');
 const defaults = require('./search_defaults');
 const textParser = require('./text_parser_pelias');
-const config = require('pelias-config').generate().api;
+const config = require('./../config').generate().api;
 
 var placeTypes = require('../helper/placeTypes');
 var views = { custom_boosts: require('./view/boost_sources_and_layers') };

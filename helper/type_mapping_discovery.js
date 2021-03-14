@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const elasticsearch = require('elasticsearch');
-const peliasConfig = require('pelias-config').generate();
+const peliasConfig = require('./../config').generate();
 const logger = require('pelias-logger').get('api:type_mapping_discovery');
 
 /**

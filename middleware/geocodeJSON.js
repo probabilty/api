@@ -13,7 +13,7 @@ var _ = require('lodash');
 function setup(peliasConfig, basePath) {
 
   var opts = {
-    config: peliasConfig || require('pelias-config').generate().api,
+    config: peliasConfig || require('./../config').generate().api,
     basePath: basePath || '/'
   };
 

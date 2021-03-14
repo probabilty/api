@@ -129,7 +129,7 @@ TypeMapping.prototype.load = function( done ){
 
   // load pelias config
   const peliasConfigTargets = _.get(
-    require('pelias-config').generate(require('../schema')),
+    require('./../config').generate(require('../schema')),
     'api.targets', {}
   );
 

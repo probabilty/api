@@ -40,7 +40,7 @@ var flipNumberAndStreetCountries = [
 ];
 
 function setup() {
-  var api = require('pelias-config').generate().api;
+  var api = require('./../config').generate().api;
   var settings = api.localization;
   if (settings && settings.flipNumberAndStreetCountries) {
     var countries = settings.flipNumberAndStreetCountries;

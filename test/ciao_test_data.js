@@ -14,7 +14,7 @@
 var client = require('elasticsearch').Client(),
     async = require('async'),
     actions = [];
-var config = require('pelias-config').generate().api;
+var config = require('./../config').generate().api;
 
 // add one record per 'type' in order to cause the _default_ mapping
 // to be copied when the new type is created.
