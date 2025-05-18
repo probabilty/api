@@ -8,6 +8,18 @@ module.exports.tests.sanitizers = function(test, common) {
     var called_sanitizers = [];
 
     var autocomplete = proxyquire('../../../sanitizer/autocomplete', {
+      '../sanitizer/_default_parameters': function (defaultParameters) {
+        return {
+          sanitize: () => {
+            if (defaultParameters.key === 'value') {
+              called_sanitizers.push('_default_parameters');
+              return { errors: [], warnings: [] };
+            } else {
+              throw new Error('incorrect parameter passed to _default_parameters');
+            }
+          }
+        };
+      },
       '../sanitizer/_single_scalar_parameters': function () {
         return {
           sanitize: () => {
@@ -28,14 +40,6 @@ module.exports.tests.sanitizers = function(test, common) {
         return {
           sanitize: () => {
             called_sanitizers.push('_text_pelias_parser');
-            return { errors: [], warnings: [] };
-          }
-        };
-      },
-      '../sanitizer/_tokenizer': function () {
-        return {
-          sanitize: () => {
-            called_sanitizers.push('_tokenizer');
             return { errors: [], warnings: [] };
           }
         };
@@ -64,11 +68,26 @@ module.exports.tests.sanitizers = function(test, common) {
           throw new Error('incorrect parameters passed to _targets');
         }
       },
-
       '../sanitizer/_sources_and_layers': function () {
         return {
           sanitize: () => {
             called_sanitizers.push('_sources_and_layers');
+            return { errors: [], warnings: [] };
+          }
+        };
+      },
+      '../sanitizer/_address_layer_filter': function () {
+        return {
+          sanitize: () => {
+            called_sanitizers.push('_address_layer_filter');
+            return { errors: [], warnings: [] };
+          }
+        };
+      },
+      '../sanitizer/_tokenizer': function () {
+        return {
+          sanitize: () => {
+            called_sanitizers.push('_tokenizer');
             return { errors: [], warnings: [] };
           }
         };
@@ -84,18 +103,6 @@ module.exports.tests.sanitizers = function(test, common) {
         } else {
             throw new Error('incorrect parameters passed to _flag_bool');
         }
-      },
-      '../sanitizer/_location_bias': function (defaultParameters) {
-        return {
-          sanitize: () => {
-            if (defaultParameters.key === 'value'){
-                called_sanitizers.push('_location_bias');
-                return { errors: [], warnings: [] };
-            } else {
-                throw new Error('incorrect parameter passed to _location_bias');
-            }
-          }
-        };
       },
       '../sanitizer/_geo_autocomplete': function () {
         return {
@@ -140,16 +147,17 @@ module.exports.tests.sanitizers = function(test, common) {
     });
 
     const expected_sanitizers = [
+      '_default_parameters',
       '_single_scalar_parameters',
       '_debug',
       '_text_pelias_parser',
-      '_tokenizer',
       '_size',
       '_targets/layers',
       '_targets/sources',
+      '_address_layer_filter',
+      '_tokenizer',
       '_sources_and_layers',
       '_flag_bool',
-      '_location_bias',
       '_geo_autocomplete',
       '_boundary_country',
       '_categories',

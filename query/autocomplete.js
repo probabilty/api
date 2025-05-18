@@ -15,7 +15,6 @@ var views = {
   admin_multi_match_first: require('./view/admin_multi_match_first'),
   admin_multi_match_last: require('./view/admin_multi_match_last'),
   phrase_first_tokens_only:   require('./view/phrase_first_tokens_only'),
-  boost_exact_matches:        require('./view/boost_exact_matches'),
   max_character_count_layer_filter:   require('./view/max_character_count_layer_filter'),
   focus_point_filter:         require('./view/focus_point_distance_filter')
 };
@@ -60,7 +59,7 @@ query.filter( peliasQuery.view.sources );
 query.filter( peliasQuery.view.layers );
 query.filter( peliasQuery.view.boundary_rect );
 query.filter( peliasQuery.view.boundary_circle );
-query.filter( peliasQuery.view.boundary_country );
+query.filter( peliasQuery.view.leaf.multi_match('boundary_country') );
 query.filter( peliasQuery.view.categories );
 query.filter( peliasQuery.view.boundary_gid );
 query.filter( views.focus_point_filter );
@@ -88,7 +87,7 @@ function generateQuery( clean ){
   // boundary country
   if( _.isArray(clean['boundary.country']) && !_.isEmpty(clean['boundary.country']) ){
     vs.set({
-      'boundary:country': clean['boundary.country'].join(' ')
+      'multi_match:boundary_country:input': clean['boundary.country'].join(' ')
     });
   }
 

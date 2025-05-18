@@ -1,4 +1,31 @@
 const PeliasParameterError = require('./PeliasParameterError');
+const PeliasTimeoutError = require('../sanitizer/PeliasTimeoutError');
+const PeliasServiceError = require('../sanitizer/PeliasServiceError');
+
+function getCorrectErrorType(message) {
+  if (message.includes('Timeout') || message.includes('timeout')) {
+    return new PeliasTimeoutError(message);
+  } else if (message.includes('Parse') || message.includes('parse') || message.includes('connect') || message.includes('ECONN')) {
+    return new PeliasServiceError(message);
+  }
+
+  // most errors are parameter errors
+  return new PeliasParameterError(message);
+}
+
+// Some Pelias code returns Error objects,
+// some returns strings. We want to standardize
+// on Error objects here
+function ensureInstanceOfError(error) {
+  if (error instanceof Error) {
+    // preserve the message and stack trace of existing Error objecs
+    const newError = getCorrectErrorType(error.message);
+    newError.stack = error.stack;
+    return newError;
+  }
+
+  return getCorrectErrorType(error);
+}
 
 function sanitize( req, sanitizers ){
   // init an object to store clean (sanitized) input parameters if not initialized
@@ -13,7 +40,7 @@ function sanitize( req, sanitizers ){
   const params = req.query || {};
 
   for (let s in sanitizers) {
-    var sanity = sanitizers[s].sanitize( params, req.clean );
+    var sanity = sanitizers[s].sanitize( params, req.clean, req );
 
     // if errors occurred then set them
     // on the req object.
@@ -21,25 +48,15 @@ function sanitize( req, sanitizers ){
       req.errors = req.errors.concat( sanity.errors );
     }
 
-    // all errors must be returned as PeliasParameterError object to trigger HTTP 400 errors
-    req.errors = req.errors.map(function(error) {
-      // replace any existing Error objects with the right class
-      // preserve the message and stack trace
-      if (error instanceof Error) {
-        const new_error = new PeliasParameterError(error.message);
-        new_error.stack = error.stack;
-        return new_error;
-      } else {
-        return new PeliasParameterError(error);
-      }
-    });
-
     // if warnings occurred then set them
     // on the req object.
     if( sanity.warnings.length ){
       req.warnings = req.warnings.concat( sanity.warnings );
     }
   }
+
+  // all errors must be mapped to a correct Error type to trigger the right HTTP response codes
+  req.errors = req.errors.map(ensureInstanceOfError);
 }
 
 // Adds to goodParameters every acceptable parameter passed through API call

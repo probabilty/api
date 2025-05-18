@@ -206,10 +206,10 @@ function addRoutes(app, peliasConfig) {
 
   var routers = {
     index: createRouter([
-      controllers.markdownToHtml(peliasConfig.api, './public/apiDoc.md')
+      controllers.markdownToHtml(peliasConfig.api, path.join(__dirname, '../public/apiDoc.md'))
     ]),
     attribution: createRouter([
-      controllers.markdownToHtml(peliasConfig.api, './public/attribution.md')
+      controllers.markdownToHtml(peliasConfig.api, path.join(__dirname, '../public/attribution.md'))
     ]),
     search: createRouter([
       sanitizers.search.middleware(peliasConfig.api),
@@ -233,7 +233,7 @@ function addRoutes(app, peliasConfig) {
       middleware.dedupe(),
       middleware.accuracy(),
       middleware.localNamingConventions(),
-      middleware.renamePlacenames(),
+      middleware.mapFields(),
       middleware.parseBBox(),
       middleware.normalizeParentIds(),
       middleware.changeLanguage(changeLanguageService, changeLanguageShouldExecute),
@@ -256,7 +256,7 @@ function addRoutes(app, peliasConfig) {
       middleware.dedupe(),
       middleware.accuracy(),
       middleware.localNamingConventions(),
-      middleware.renamePlacenames(),
+      middleware.mapFields(),
       middleware.parseBBox(),
       middleware.normalizeParentIds(),
       middleware.changeLanguage(changeLanguageService, changeLanguageShouldExecute),
@@ -275,7 +275,7 @@ function addRoutes(app, peliasConfig) {
       middleware.dedupe(),
       middleware.accuracy(),
       middleware.localNamingConventions(),
-      middleware.renamePlacenames(),
+      middleware.mapFields(),
       middleware.parseBBox(),
       middleware.normalizeParentIds(),
       middleware.changeLanguage(changeLanguageService, changeLanguageShouldExecute),
@@ -297,7 +297,7 @@ function addRoutes(app, peliasConfig) {
       middleware.dedupe(),
       middleware.accuracy(),
       middleware.localNamingConventions(),
-      middleware.renamePlacenames(),
+      middleware.mapFields(),
       middleware.parseBBox(),
       middleware.normalizeParentIds(),
       middleware.changeLanguage(changeLanguageService, changeLanguageShouldExecute),
@@ -318,7 +318,7 @@ function addRoutes(app, peliasConfig) {
       middleware.dedupe(),
       middleware.accuracy(),
       middleware.localNamingConventions(),
-      middleware.renamePlacenames(),
+      middleware.mapFields(),
       middleware.parseBBox(),
       middleware.normalizeParentIds(),
       middleware.changeLanguage(changeLanguageService, changeLanguageShouldExecute),
@@ -333,7 +333,7 @@ function addRoutes(app, peliasConfig) {
       middleware.expandDocument(peliasConfig.api, esclient),
       middleware.accuracy(),
       middleware.localNamingConventions(),
-      middleware.renamePlacenames(),
+      middleware.mapFields(),
       middleware.parseBBox(),
       middleware.normalizeParentIds(),
       middleware.changeLanguage(changeLanguageService, changeLanguageShouldExecute),

@@ -3,17 +3,18 @@ const _ = require('lodash');
 const PARENT_PROPS = require('../helper/placeTypes');
 
 const ADDRESS_PROPS = [
+  { name: 'unit',   newName: 'unit' },
   { name: 'number', newName: 'housenumber' },
-  { name: 'zip',    newName: 'postalcode', transform: (value) => { return [value]; } },
+  { name: 'zip',    newName: 'postalcode' },
   { name: 'street', newName: 'street' }
 ];
 
 
 function setup() {
-  return renamePlacenames;
+  return mapFields;
 }
 
-function renamePlacenames(req, res, next) {
+function mapFields(req, res, next) {
   // do nothing if no result data set
   if (!res || !res.data) {
     return next();

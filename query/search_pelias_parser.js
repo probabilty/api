@@ -18,7 +18,7 @@ var adminFields = placeTypes.concat(['region_a']);
 var query = new peliasQuery.layout.FilteredBooleanQuery();
 
 // mandatory matches
-query.score( peliasQuery.view.ngrams, 'must' );
+query.score( peliasQuery.view.leaf.match('main'), 'must' );
 
 // scoring boost
 const phrase_view = peliasQuery.view.leaf.match_phrase('main');
@@ -44,7 +44,7 @@ query.filter( peliasQuery.view.boundary_rect );
 query.filter( peliasQuery.view.sources );
 query.filter( peliasQuery.view.layers );
 query.filter( peliasQuery.view.categories );
-query.filter( peliasQuery.view.boundary_country );
+query.filter( peliasQuery.view.leaf.multi_match('boundary_country') );
 query.filter( peliasQuery.view.boundary_gid );
 
 // --------------------------------
@@ -59,6 +59,7 @@ function generateQuery( clean ){
 
   // input text
   vs.var( 'input:name', clean.text );
+  vs.var( 'match:main:input', clean.text );
   vs.var( 'match_phrase:main:input', clean.text );
 
   // sources
@@ -122,7 +123,7 @@ function generateQuery( clean ){
   // boundary country
   if( _.isArray(clean['boundary.country']) && !_.isEmpty(clean['boundary.country']) ){
     vs.set({
-      'boundary:country': clean['boundary.country'].join(' ')
+      'multi_match:boundary_country:input': clean['boundary.country'].join(' ')
     });
   }
 

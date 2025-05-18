@@ -1,4 +1,4 @@
-class PeliasParameterError extends Error {
+class PeliasServiceError extends Error {
   constructor(message = '') {
     super(message);
   }
@@ -12,4 +12,4 @@ class PeliasParameterError extends Error {
   }
 }
 
-module.exports = PeliasParameterError;
+module.exports = PeliasServiceError;

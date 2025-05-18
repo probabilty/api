@@ -5,12 +5,10 @@ module.exports = {
     'bool': {
       'must': [{
         'match': {
-          'name.default': {
+          'phrase.default': {
             'query': '123 main st',
-            'cutoff_frequency': 0.01,
             'minimum_should_match': '1<-1 3<-25%',
             'analyzer': 'peliasQuery',
-            'boost': 1
           }
         }
       }],
@@ -62,7 +60,6 @@ module.exports = {
         'match': {
           'address_parts.number': {
             'query': '123',
-            'cutoff_frequency': 0.01,
             'boost': vs['address:housenumber:boost'],
             'analyzer': vs['address:housenumber:analyzer']
           }
@@ -71,7 +68,6 @@ module.exports = {
         'match': {
           'address_parts.street': {
             'query': 'main st',
-            'cutoff_frequency': 0.01,
             'boost': vs['address:street:boost'],
             'analyzer': vs['address:street:analyzer']
           }
@@ -80,7 +76,6 @@ module.exports = {
         'match': {
           'address_parts.zip': {
             'query': '10010',
-            'cutoff_frequency': 0.01,
             'boost': vs['address:postcode:boost'],
             'analyzer': vs['address:postcode:analyzer']
           }

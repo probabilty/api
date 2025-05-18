@@ -4,6 +4,7 @@
 <h3 align="center">A modular, open-source search engine for our world.</h3>
 <p align="center">Pelias is a geocoder powered completely by open data, available freely to everyone.</p>
 <p align="center">
+<a href="https://github.com/pelias/api/actions"><img src="https://github.com/pelias/api/workflows/Continuous%20Integration/badge.svg" /></a>
 <a href="https://en.wikipedia.org/wiki/MIT_License"><img src="https://img.shields.io/github/license/pelias/api?style=flat&color=orange" /></a>
 <a href="https://hub.docker.com/u/pelias"><img src="https://img.shields.io/docker/pulls/pelias/api?style=flat&color=informational" /></a>
 <a href="https://gitter.im/pelias/pelias"><img src="https://img.shields.io/gitter/room/pelias/pelias?style=flat&color=yellow" /></a>
@@ -62,7 +63,8 @@ The API recognizes the following properties under the top-level `api` key in you
 |---|---|---|---|
 |`services`|*no*||Service definitions for [point-in-polygon](https://github.com/pelias/pip-service), [libpostal](https://github.com/whosonfirst/go-whosonfirst-libpostal), [placeholder](https://github.com/pelias/placeholder), and [interpolation](https://github.com/pelias/interpolation) services. For a description of when different Pelias services are recommended or required, see our [services documentation](https://github.com/pelias/documentation/blob/master/services.md).|
 |`defaultParameters.focus.point.lon` <br> `defaultParameters.focus.point.lat`|no | |default coordinates for focus point
-|`targets.auto_discover`|no|false|Should `sources` and `layers` be automatically discovered by querying elasticsearch at process startup. (See more info in the [Custom sources and layers](#custom-sources-and-layers) section below).
+|`targets.auto_discover`|no|true|Should `sources` and `layers` be automatically discovered by querying Elasticsearch at process startup. (See more info in the [Custom sources and layers](#custom-sources-and-layers) section below).
+|`targets.auto_discover_required`|no|false|If set to `true`, type mapping discovery failures will result in a fatal error. This means a valid connection to a working Elasticsearch cluster with a Pelias index is _required_ on startup. Setting this to true can help prevent issues such as incorrect configuration in production environments
 |`targets.layers_by_source` <br> `targets.source_aliases` <br> `targets.layer_aliases`|no | |custom values for which `sources` and `layers` the API accepts (See more info in the [Custom sources and layers](#custom-sources-and-layers) section below). We recommend using the `targets.auto_discover:true` configuration instead of setting these manually.
 |`customBoosts` | no | `{}` | Allows configuring boosts for specific sources and layers, in order to influence result order. See [Configurable Boosts](#custom-boosts) below for details |
 |`autocomplete.exclude_address_length` | no | 0 | As a performance optimization, this optional filter excludes results from the 'address' layer for any queries where the character length of the 'subject' portion of the parsed_text is equal to or less than this many characters in length. Addresses are usually the bulk of the records in Elasticsearch, and searching across all of them for very short text inputs can be slow, with little benefit. Consider setting this to 1 or 2 if you have several million addresses in Pelias. |
@@ -71,6 +73,9 @@ The API recognizes the following properties under the top-level `api` key in you
 |`accessLog`|*no*||name of the format to use for access logs; may be any one of the [predefined values](https://github.com/expressjs/morgan#predefined-formats) in the `morgan` package. Defaults to `"common"`; if set to `false`, or an otherwise falsy value, disables access-logging entirely.|
 |`relativeScores`|*no*|true|if set to true, confidence scores will be normalized, realistically at this point setting this to false is not tested or desirable
 |`exposeInternalDebugTools`|*no*|true|Exposes several debugging tools, such as the ability to enable Elasticsearch explain mode, that may come at a performance cost or expose sensitive infrastructure details. Not recommended if the Pelias API is open to the public.
+|`minSize`|*no*|1| Allows configuring the minimum number of results a query can request.
+|`maxSize`|*no*|40| Allows configuring the maximum number of results a query can request.
+|`defaultSize`|*no*|10| Allows configuring the number of results a query will request when a size wasn't specified. Must be greater than or equal to `minSize` and smaller than or equal to `maxSize`.
 
 A good starting configuration file includes this section (fill in the service and Elasticsearch hosts as needed):
 
@@ -111,18 +116,13 @@ The `timeout` and `retry` values, as show in in the `pip` service section, are o
 
 Pelias allows importing your own data with custom values for `source` and `layer`.
 
-Custom sources and layers are not automatically detected, you MUST set `targets.auto_discover` to `true` in your `pelias.json` to make Pelias aware of them.
+Custom sources and layers are automatically detected on startup of the API. To disable this behavior (not recommended), set `targets.auto_discover` to `false` in your `pelias.json`.
 
-The `auto_discover` functionality sends a request to elasticsearch in order to automatically discover sources and layers from elasticsearch when the API server starts-up.
+The `auto_discover` functionality sends a request to Elasticsearch in order to automatically discover sources and layers from Elasticsearch when the API server starts-up.
 
-Be aware that the query sent to Elasticsearch can take several seconds to execute the first time against a large index, potentially impacting the performance of other queries hitting Elasticsearch at the same time. The query is cached in Elasticsearch for subsequent requests.
+In setups with lots of data (hundreds of millions of records loaded), and low CPU resources, the query sent to Elasticsearch can take several seconds to execute, potentially impacting the performance of other queries hitting Elasticsearch at the same time. The query is cached in Elasticsearch for subsequent requests.
 
-If you are importing custom layers and are running a city or small region sized build then the impact of this query will likely be negligible, you can safely use `targets.auto_discover:true`.
-
-For advanced users running a full-planet build with custom layers or sources, and also concerned about this start-up delay, you have two options:
-
-1. execute the `auto_discover` query once manually to prime the cache **or**
-2. set `targets.auto_discover: false` and manually define the layers as documented below.
+In the rare event this causes issues, the following configuration options can be set to configure sources and layers by hand.
 
 #### `layers_by_source`
 
@@ -266,6 +266,4 @@ $ curl localhost:9200/pelias/_count?pretty
 
 ### Continuous Integration
 
-Travis tests every release against all supported Node.js versions.
-
-[![Build Status](https://travis-ci.org/pelias/api.png?branch=master)](https://travis-ci.org/pelias/api)
+CI tests every release against all supported Node.js versions.
